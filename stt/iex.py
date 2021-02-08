@@ -17,15 +17,15 @@ class iex:
             financials_url = f"https://sandbox.iexapis.com/stable/stock/{ticker}/financials?period={period}&last={time}&token={token}"
             financials_json = requests.get(financials_url).json()
             portfolio[ticker] = pd.DataFrame(financials_json['financials'])
-            return portfolio
+        return portfolio
 
 
-    def add_company(ls):
+    def add_company(ls, token):
         for ticker in ls:
             company_url = f"https://sandbox.iexapis.com/stable/stock/{ticker}/company?token={token}"
             company_json = requests.get(company_url).json()
             portfolio_det[ticker] = pd.DataFrame(company_json)
-            return portfolio_det
+        return portfolio_det
 
     def preprocess(dic):
         for v in dic.values():
@@ -33,7 +33,7 @@ class iex:
             v['fiscaldate'] = pd.to_datetime(v['fiscaldate']).dt.strftime('%Y%m')
             v.set_index(v['fiscaldate'], inplace=True)
             v['fcf'] = v['cashflow'] + v['researchanddevelopment']
-            return v
+        return dic
 
     def add_profitability(dic):
         for df in dic.values():
@@ -44,7 +44,7 @@ class iex:
             df['equity_multipl'] = df['totalassets'] / df['shareholderequity']
             df['roe'] = df['netincome'] / df['shareholderequity']
             df['fcf_margin'] = (df['cashflow'] + df['researchanddevelopment']) / df['revenue']
-            return df
+        return dic
 
     def add_financial_strength(dic):
         for df in dic.values():
@@ -52,7 +52,7 @@ class iex:
             df['equity_asset'] = df['shareholderequity'] / df['totalassets']
             df['debt_equity'] = df['totaldebt'] / df['shareholderequity']
             df['debt_ebitda'] = df['totaldebt'] / (df['ebitda']*4)
-            return df
+        return dic
 
     def graphs_financials(dic):
         for k, v in dic.items():
@@ -77,7 +77,7 @@ class iex:
             axes[1,1].grid(True,which="both", linestyle='--')
             axes[2,0].grid(True,which="both", linestyle='--')
             axes[2,1].grid(True,which="both", linestyle='--')
-            return plt.show()
+            plt.show()
 
     def graphs_profitability(dic):
         for k, v in dic.items():
@@ -102,7 +102,7 @@ class iex:
             axes[1,1].grid(True,which="both", linestyle='--')
             axes[2,0].grid(True,which="both", linestyle='--')
             axes[2,1].grid(True,which="both", linestyle='--')
-            return plt.show()
+            plt.show()
 
     def graphs_security(dic):
         for k, v in dic.items():
@@ -133,4 +133,4 @@ class iex:
             axes[2,1].grid(True,which="both", linestyle='--')
             axes[3,0].grid(True,which="both", linestyle='--')
             axes[3,1].grid(True,which="both", linestyle='--')
-            return plt.show()
+            plt.show()
